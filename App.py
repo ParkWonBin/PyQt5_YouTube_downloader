@@ -5,10 +5,13 @@ import youtube_dl
 class yt_downloader:
     def __init__(self):
         self.debug = False
-        self.folderPath = f"{os.path.expanduser('~')}/Desktop/유튜브 다운로드/"
         self.yt_url = ''
         self.outtmpl = ''
         self.thumbnail = ''
+        self.folderPath = ''
+
+        self.set_dir(f"{os.path.expanduser('~')}/Desktop/유튜브 다운로드")
+        self.set_outtmpl()
 
     def print(self,*txt):
         if self.debug : print(*txt)
@@ -21,14 +24,22 @@ class yt_downloader:
     def set_dir(self, folderPath):
         try :
             if not os.path.isdir(folderPath):
-                self.print('폴터 생성')
                 os.makedirs(folderPath)
-
+                self.print('폴터 생성')
             self.folderPath = folderPath
-            self.get_dir()
+            self.set_outtmpl()
         except :
             print(f'잘못된 경로 :\n{folderPath}')
-        ##############################
+
+    def set_outtmpl(self):
+        url = self.yt_url
+        # 저장할 이름 설정
+        info_list = ['uploader', 'title']
+        if 'list' in url: info_list.insert(0, 'playlist_title')
+        info = f"\%({r')s_%('.join(info_list)})s"
+        self.outtmpl = self.folderPath + info + '.%(ext)s'
+        self.outtmpl = self.outtmpl.replace('NA_', '')
+        self.print(self.outtmpl)
 
     def set_url(self,input_url):
         url = input_url.replace("'","").replace('"','').replace(" ","")
@@ -38,23 +49,18 @@ class yt_downloader:
             if requests.get(url).status_code == 200 :
                 self.print('입력된 주소 : '+url)
                 self.yt_url = url
+                self.set_outtmpl()
+
                 url_id = url[url.find('?v=') + 3:].split('&list')[0]
                 self.thumbnail = f'https://img.youtube.com/vi/{url_id}/maxresdefault.jpg'
             else : return
         else : return
 
-        # 저장할 이름 설정
-        info_list = ['uploader', 'title']
-        if 'list' in url : info_list.insert(0, 'playlist_title')
-        info = f"%({r')s_%('.join(info_list)})s"
-        self.outtmpl = self.folderPath + info + '.%(ext)s'
-        self.outtmpl = self.outtmpl.replace('NA_','')
-
     def get_thumbnail(self):
         self.print("썸네일 : ",self.thumbnail)
         return self.thumbnail
 
-    def download(self):
+    def download_mp4(self):
         self.print('mp4 다운로드')
         urls = self.yt_url
         outtmpl = self.outtmpl
