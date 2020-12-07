@@ -1,4 +1,5 @@
 import os
+import requests
 import youtube_dl
 
 class yt_downloader:
@@ -7,6 +8,7 @@ class yt_downloader:
         self.folderPath = f"{os.path.expanduser('~')}/Desktop/유튜브 다운로드/"
         self.yt_url = ''
         self.outtmpl = ''
+        self.thumbnail = ''
 
     def print(self,*txt):
         if self.debug : print(*txt)
@@ -29,9 +31,17 @@ class yt_downloader:
         ##############################
 
     def set_url(self,input_url):
-        url = input_url.strip("'").strip('"')
-        self.print('입력된 주소 : '+url)
-        self.yt_url = url
+        url = input_url.replace("'","").replace('"','').replace(" ","")
+
+        # 유효성 검사
+        if 'youtube.com/watch?v=' in url :
+            if requests.get(url).status_code == 200 :
+                self.print('입력된 주소 : '+url)
+                self.yt_url = url
+                url_id = url[url.find('?v=') + 3:].split('&list')[0]
+                self.thumbnail = f'https://img.youtube.com/vi/{url_id}/maxresdefault.jpg'
+            else : return
+        else : return
 
         # 저장할 이름 설정
         info_list = ['uploader', 'title']
@@ -39,6 +49,10 @@ class yt_downloader:
         info = f"%({r')s_%('.join(info_list)})s"
         self.outtmpl = self.folderPath + info + '.%(ext)s'
         self.outtmpl = self.outtmpl.replace('NA_','')
+
+    def get_thumbnail(self):
+        self.print("썸네일 : ",self.thumbnail)
+        return self.thumbnail
 
     def download(self):
         self.print('mp4 다운로드')
@@ -81,12 +95,16 @@ if __name__ == '__main__':
 
     App.set_url(url)
     App.get_dir()
+    App.get_thumbnail()
     App.download()
     App.download_mp3()
 
+url = 'http://youtube.com/watch?v=9bZkp7q19f0'
+url = 'https://www.youtube.com/watch?v=lr_NsUOpqbA&list=PLxqyJJGD5pCVEg-7XlPtLdyDU_AzwX8Yj'  # 재생목록
 
 # 참고 자료
 # ydl_opts : https://tech.dslab.kr/2019/09/10/python-youtube_dl/
+# thumbnail : https://blog.kesuskim.com/2016/08/how-to-get-youtube-thumbnail/
 
 ######## output template :
 # https://github.com/ytdl-org/youtube-dl/blob/master/README.md
