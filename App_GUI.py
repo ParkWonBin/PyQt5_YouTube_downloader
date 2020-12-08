@@ -67,15 +67,15 @@ class WindowClass(QDialog, UI_load, pwb_Frameless) :
         self.btn_exit.clicked.connect(self.e_btn_exit)
         self.search_btn.clicked.connect(self.e_search_btn)
         self.search_input.installEventFilter(self)
-        self.search_input.setFocus()
 
     def eventFilter(self, obj, event):
+        # 클립보드 복사
         if obj != self.search_input: pass
         elif event.type() == QEvent.FocusIn:
-            # 클립보드 복사
             clip = pyperclip.paste()
             if 'youtube.com/' in clip:
                 self.search_input.setText(clip)
+                self.e_search_btn()
             else :
                 self.search_input.setText('')
         elif event.type() == QEvent.FocusOut:
@@ -86,22 +86,26 @@ class WindowClass(QDialog, UI_load, pwb_Frameless) :
 
     def e_search_btn(self):
         self.print("search_btn clicked")
-        self.print(self.search_input.text())
+        url = self.search_input.text()
+        self.print(url)
+        self.App.set_url(url)
     def e_btn_MP4(self):
         self.print('MP4_clicked')
-        #self.App.download_mp4()
+        self.App.download_mp4()
+        self.App.get_dir()
     def e_btn_MP3(self):
         self.print('MP3_clicked')
-        #self.App.download_mp3()
+        self.App.download_mp3()
+        self.App.get_dir()
     def e_btn_exit(self):
         self.print('exit_clicked')
-        # self.close()
+        self.close()
     def dropEvent(self, event):
         drop = event.mimeData().text().lstrip("file:///")
         self.print(drop)
         if os.path.isdir(drop):
             self.print("다운로드 폴더변경")
-            # self.App.set_dir(drop)
+            self.App.set_dir(drop)
         else: self.print("폴더 아님")
 
 
