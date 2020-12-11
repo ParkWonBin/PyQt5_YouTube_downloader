@@ -1,4 +1,4 @@
-import sys,urllib.request
+import sys, urllib.request
 from PyQt5.QtGui import QImage, QPainter,QPixmap
 from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtWidgets import QWidget, QMainWindow, QVBoxLayout, QApplication, QLabel
@@ -27,21 +27,21 @@ class Window(QMainWindow,move):
         qp = QPainter(self)
         qp.drawImage(0, 0, self.image.scaled(self.size()))
 
+    def load_img(self,url):
+        qPixmapVar = QPixmap()
+        is_web = bool('http' in url)
+
+        if not is_web:
+            qPixmapVar.load(url)
+        else:
+            web_img = urllib.request.urlopen(url).read()
+            qPixmapVar.loadFromData(web_img)
+        return qPixmapVar
+
     def __init__(self):
         super().__init__()
-
-        web_url = 'https://img.youtube.com/vi/WGUyDrzf93c/maxresdefault.jpg'
-        self.qPixmapWebVar = QPixmap()
-        self.qPixmapWebVar.loadFromData(web_url)
-        self.qPixmapWebVar = self.qPixmapWebVar.scaled(self.image_viewer.size()*3)
-        self.image_viewer.setPixmap(self.qPixmapWebVar)
-# 
-        pixmap.toImage()
-        QImageimage(pixmap.toImage().convertToFormat()
-        self.image = QImage(QImageimage)
-
-        #self.canvas= QWidget()
-       # self.image = QImage('image.jpg')
+        self.canvas= QWidget()
+        self.image = QImage('image.jpg')
 
         # 레이아웃 및 캔버스 배치
         layout = QVBoxLayout()
@@ -52,6 +52,13 @@ class Window(QMainWindow,move):
         content.setLayout(layout)
         self.setCentralWidget(content)
 
+        ####################
+        url = "image.jpg"
+        url = 'https://img.youtube.com/vi/WGUyDrzf93c/maxresdefault.jpg'
+        self.Desk2 = QLabel(self.canvas)
+        self.Desk2.setPixmap(self.load_img(url))
+
+        ################
         self.Desk = QLabel(' \n123  \n ', self.canvas)
         self.Desk.setStyleSheet("color: black;"
                                 "background-color: #FFFFFF;"

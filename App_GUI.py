@@ -52,7 +52,7 @@ class Canvas(QWidget):
         self.image = QImage()
 
     def paintEvent(self, event):
-        qp = QPainter(self)QWidget
+        qp = QPainter(self)
 
         if not self.image.isNull():
             image = self.image.scaled(self.size()) #image_viewer
