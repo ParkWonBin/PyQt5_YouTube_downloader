@@ -1,5 +1,5 @@
-import sys
-from PyQt5.QtGui import QImage, QPainter
+import sys,urllib.request
+from PyQt5.QtGui import QImage, QPainter,QPixmap
 from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtWidgets import QWidget, QMainWindow, QVBoxLayout, QApplication, QLabel
 
@@ -9,7 +9,10 @@ class move :
 
     def mousePressEvent(self, event):
         self.oldPos = event.globalPos()
-        self.mouseButtonKind(event.buttons())
+        btn = event.buttons()
+        if btn & Qt.LeftButton: self.is_clicked_L = True
+        if btn & Qt.RightButton: self.is_clicked_L = False
+        if btn & Qt.MidButton:  sys.exit(app.exec_())
 
     def mouseMoveEvent(self, event):
         delta = QPoint(event.globalPos() - self.oldPos)
@@ -19,11 +22,6 @@ class move :
             self.resize(self.width() + delta.x(), self.height() + delta.y())
         self.oldPos = event.globalPos()
 
-    def mouseButtonKind(self, buttons):
-        if buttons & Qt.LeftButton: self.is_clicked_L = True
-        if buttons & Qt.RightButton: self.is_clicked_L = False
-        if buttons & Qt.MidButton:  sys.exit(app.exec_())
-
 class Window(QMainWindow,move):
     def paintEvent(self, event):
         qp = QPainter(self)
@@ -31,8 +29,19 @@ class Window(QMainWindow,move):
 
     def __init__(self):
         super().__init__()
-        self.image = QImage('image.jpg')
-        self.canvas = QWidget()
+
+        web_url = 'https://img.youtube.com/vi/WGUyDrzf93c/maxresdefault.jpg'
+        self.qPixmapWebVar = QPixmap()
+        self.qPixmapWebVar.loadFromData(web_url)
+        self.qPixmapWebVar = self.qPixmapWebVar.scaled(self.image_viewer.size()*3)
+        self.image_viewer.setPixmap(self.qPixmapWebVar)
+# 
+        pixmap.toImage()
+        QImageimage(pixmap.toImage().convertToFormat()
+        self.image = QImage(QImageimage)
+
+        #self.canvas= QWidget()
+       # self.image = QImage('image.jpg')
 
         # 레이아웃 및 캔버스 배치
         layout = QVBoxLayout()
