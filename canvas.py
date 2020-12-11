@@ -31,17 +31,17 @@ class Window(QMainWindow,move):
         qPixmapVar = QPixmap()
         is_web = bool('http' in url)
 
-        if not is_web:
-            qPixmapVar.load(url)
-        else:
+        if is_web:
             web_img = urllib.request.urlopen(url).read()
             qPixmapVar.loadFromData(web_img)
+        else:
+            qPixmapVar.load(url)
+
         return qPixmapVar
 
     def __init__(self):
         super().__init__()
         self.canvas= QWidget()
-        self.image = QImage('image.jpg')
 
         # 레이아웃 및 캔버스 배치
         layout = QVBoxLayout()
@@ -50,15 +50,21 @@ class Window(QMainWindow,move):
 
         content = QWidget()
         content.setLayout(layout)
-        self.setCentralWidget(content)
+        self.setCentralWidget(content) # 그림을 겹치기 위한 레이아웃
 
-        ####################
+        # 이미지 표현 방법 1
+        # 배경 그리기 : self의 paint event로 배경을 그림
+        # 이미지변환 : https://beausty23.tistory.com/76
+        url = 'https://img.youtube.com/vi/cbuZfY2S2UQ/maxresdefault.jpg'
+        self.image = self.load_img(url).toImage()
+
+        # 이미지 표현 방법 2
+        # 배경 위에 떠있는 canvas에 라벨을 추가한 것임
         url = "image.jpg"
-        url = 'https://img.youtube.com/vi/WGUyDrzf93c/maxresdefault.jpg'
         self.Desk2 = QLabel(self.canvas)
         self.Desk2.setPixmap(self.load_img(url))
 
-        ################
+        # 텍스트 표현 방법
         self.Desk = QLabel(' \n123  \n ', self.canvas)
         self.Desk.setStyleSheet("color: black;"
                                 "background-color: #FFFFFF;"
