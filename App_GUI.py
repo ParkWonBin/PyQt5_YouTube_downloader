@@ -1,13 +1,9 @@
-import os, sys, pyperclip, urllib.request
+import os, sys, pyperclip,urllib.request
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt, QPoint, QEvent,QSize
 from PyQt5.QtGui import QImage, QPainter, QPixmap
 from PyQt5 import uic
 from App import yt_downloader
-
-web_url = 'https://img.youtube.com/vi/WGUyDrzf93c/maxresdefault.jpg'
-web_img = urllib.request.urlopen(web_url).read()
-image = QImage(web_url)
 
 # UI 불러오기
 UI_load = uic.loadUiType("YouTube_downloader.ui")[0]
@@ -21,18 +17,23 @@ class pwb_Frameless(QMainWindow):
 
     def mousePressEvent(self, event):
         self.oldPos = event.globalPos()
-        btn = event.buttons()
-        if btn & Qt.LeftButton: self.is_clicked_L = True
-        if btn & Qt.RightButton: self.is_clicked_L = False
-        if btn & Qt.MidButton:  sys.exit(app.exec_())
+        self.mouseButtonKind(event.buttons())
 
     def mouseMoveEvent(self, event):
         delta = QPoint(event.globalPos() - self.oldPos)
         if self.is_clicked_L:
             self.move(self.x() + delta.x(), self.y() + delta.y())
         else:
-            self.resize(self.width() + delta.x(), self.height() + delta.y())
+            self.resize_window(self.width() + delta.x(), self.height() + delta.y())
         self.oldPos = event.globalPos()
+
+    def mouseButtonKind(self, buttons):
+        if buttons & Qt.LeftButton: self.is_clicked_L = True
+        if buttons & Qt.RightButton: self.is_clicked_L = False
+        if buttons & Qt.MidButton:  sys.exit(app.exec_())
+
+    def resize_window(self, x, y):
+        self.resize(x, y)
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasText():
@@ -52,14 +53,12 @@ class Canvas(QWidget):
         self.image = QImage()
 
     def paintEvent(self, event):
-        qp = QPainter(self)QWidget
-
+        qp = QPainter(self)
         if not self.image.isNull():
             image = self.image.scaled(self.size()) #image_viewer
             print(123)
             qp.drawImage(0, 0, image)
-        else:
-            print(111)
+        else:print(111)
 
 # GUI 프로그램
 class WindowClass(QDialog, UI_load, pwb_Frameless) :
@@ -75,7 +74,7 @@ class WindowClass(QDialog, UI_load, pwb_Frameless) :
         # GUI에서 App 사용
         self.App = yt_downloader()
         # self.lbl_picture = QLabel(self.image_viewer)
-        #self.loadImageFromWeb()
+        self.loadImageFromWeb()
 
         # 이벤트 연결
         self.btn_MP3.clicked.connect(self.e_btn_MP3)
@@ -85,7 +84,7 @@ class WindowClass(QDialog, UI_load, pwb_Frameless) :
         self.search_input.installEventFilter(self)
         self.image_viewer.installEventFilter(self)
 
-    #def loadImageFromWeb(self):
+    d#ef loadImageFromWeb(self):
         # Web에서 Image 정보 로드
         # urlString = 'https://img.youtube.com/vi/WGUyDrzf93c/maxresdefault.jpg'
         # imageFromWeb = urllib.request.urlopen(urlString).read()
