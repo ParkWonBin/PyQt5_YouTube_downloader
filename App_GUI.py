@@ -5,14 +5,9 @@ from PyQt5.QtGui import QImage, QPainter, QPixmap
 from PyQt5 import uic
 from App import yt_downloader
 
-web_url = 'https://img.youtube.com/vi/WGUyDrzf93c/maxresdefault.jpg'
-web_img = urllib.request.urlopen(web_url).read()
-image = QImage(web_url)
-
 # UI 불러오기
 UI_load = uic.loadUiType("YouTube_downloader.ui")[0]
 
-# 프레임 없는 창
 class pwb_Frameless(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -51,15 +46,23 @@ class Canvas(QWidget):
         super().__init__()
         self.image = QImage()
 
-    def paintEvent(self, event):
-        qp = QPainter(self)
+    def set_image(self,url):
+        qPixmapVar = QPixmap()
 
-        if not self.image.isNull():
-            image = self.image.scaled(self.size()) #image_viewer
-            print(123)
-            qp.drawImage(0, 0, image)
+        if ('http' in url):
+            web_img = urllib.request.urlopen(url).read()
+            qPixmapVar.loadFromData(web_img)
         else:
-            print(111)
+            qPixmapVar.load(url)
+
+        self.image = qPixmapVar.toImage() # QImage
+
+    def paintEvent(self, event):
+        if self.image.isNull():
+            print('이미지가 없습니다.')
+        else:
+            qp = QPainter(self)
+            qp.drawImage(0, 0, self.image.scaled(self.size()))
 
 # GUI 프로그램
 class WindowClass(QDialog, UI_load, pwb_Frameless) :
@@ -85,35 +88,8 @@ class WindowClass(QDialog, UI_load, pwb_Frameless) :
         self.search_input.installEventFilter(self)
         self.image_viewer.installEventFilter(self)
 
-    #def loadImageFromWeb(self):
-        # Web에서 Image 정보 로드
-        # urlString = 'https://img.youtube.com/vi/WGUyDrzf93c/maxresdefault.jpg'
-        # imageFromWeb = urllib.request.urlopen(urlString).read()
-        #
-        # # 웹에서 Load한 Image를 이용하여 QPixmap에 사진데이터를 Load하고, Label을 이용하여 화면에 표시
-        # self.qPixmapWebVar = QPixmap()
-        # self.qPixmapWebVar.loadFromData(imageFromWeb)
-        # self.qPixmapWebVar = self.qPixmapWebVar.scaled(self.image_viewer.size()*3)
-        # self.image_viewer.setPixmap(self.qPixmapWebVar)
-        # print(self.image_viewer.size())
-
-    # def resizeEvent(self, event):
-    #     # self.qPixmapWebVar = self.qPixmapWebVar.scaledToWidth(self.size().width())
-    #     self.image_viewer.setPixmap(self.qPixmapWebVar)
-    #     self.image_viewer.resize(QSize(self.geometry()))
-    #
-    # def paintEvent(self, event):
-    #     qp = QPainter(self)
-    #     qp.begin(self)
-    #     self.drawText(event, qp)
-    #     qp.end()
-    #
-    #     image = self.image_viewer.scaled(self.size())
-    #     qp.drawImage(0, 0, image)
-
-
     def eventFilter(self, obj, event):
-        # 클립보드 복사
+        # search_input 에 클립보드 복사해서 넣기
         if obj != self.search_input: pass
         elif event.type() == QEvent.FocusIn:
             clip = pyperclip.paste()
@@ -122,12 +98,10 @@ class WindowClass(QDialog, UI_load, pwb_Frameless) :
                 self.e_search_btn()
             else :
                 self.search_input.setText('')
-
         elif event.type() == QEvent.FocusOut:
             if not self.search_input.text():
                 self.print('내용없음')
                 self.search_input.setText('유튜브 주소를 입력해주세요.')
-
 
         return super(WindowClass, self).eventFilter(obj, event)
     def e_search_btn(self):

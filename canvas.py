@@ -22,7 +22,7 @@ class move :
             self.resize(self.width() + delta.x(), self.height() + delta.y())
         self.oldPos = event.globalPos()
 
-class Window(QMainWindow,move):
+class canvas(QMainWindow,move):
     def paintEvent(self, event):
         qp = QPainter(self)
         qp.drawImage(0, 0, self.image.scaled(self.size()))
@@ -73,7 +73,9 @@ class Window(QMainWindow,move):
                                 "border-color: #AAAAAA")
 
 if __name__ == "__main__":
+    # desinger랑 같이 사용하는 방법
+    # https://stackoverflow.com/questions/51768266/painting-in-a-qlabel-with-paintevent
     app = QApplication(sys.argv)
-    window = Window()
+    window = canvas()
     window.show()
     sys.exit(app.exec_())
